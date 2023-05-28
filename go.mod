@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/gin-contrib/cors v1.3.1
-	github.com/gin-gonic/gin v1.7.7
+	github.com/gin-gonic/gin v1.9.0
 	github.com/stretchr/testify v1.7.1
 	gopkg.in/square/go-jose.v2 v2.1.7
 )
