@@ -9,6 +9,7 @@ import (
 	"fmt"
 	cors "github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	jose "gopkg.in/go-jose/go-jose.v2"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -68,7 +69,7 @@ func LoadPublicKey(data []byte) (interface{}, error) {
 		return cert.PublicKey, nil
 	}
 
-	return nil, fmt.Errorf("square/go-jose: parse error, got '%s' and '%s'", err0, err1)
+	return nil, fmt.Errorf("go-jose/go-jose: parse error, got '%s' and '%s'", err0, err1)
 }
 
 func init() {
