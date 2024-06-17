@@ -61,7 +61,7 @@ func LoadPublicKey(data []byte) (interface{}, error) {
 		return cert.PublicKey, nil
 	}
 
-	return nil, fmt.Errorf("square/go-jose: parse error, got '%s' and '%s'", err0, err1)
+	return nil, fmt.Errorf("go-jose/go-jose: parse error, got '%s' and '%s'", err0, err1)
 }
 // Create a configuration with the Auth0 information
 pem, err := ioutil.ReadFile("path/to/your/cert.pem")
