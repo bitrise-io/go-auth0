@@ -28,33 +28,44 @@ type JWKS struct {
 type JWKClient struct {
 	keyCacher KeyCacher
 	mu        sync.Mutex
-	options   JWKClientOptions
+	options   []JWKClientOptions
 	extractor RequestTokenExtractor
 }
 
-// NewJWKClient creates a new JWKClient instance from the
-// provided options.
-func NewJWKClient(options JWKClientOptions, extractor RequestTokenExtractor) *JWKClient {
+// NewJWKClient creates a new JWKClient instance from the provided options.
+// It accepts either a single JWKClientOptions or a slice of JWKClientOptions.
+func NewJWKClient[T JWKClientOptions | []JWKClientOptions](options T, extractor RequestTokenExtractor) *JWKClient {
 	return NewJWKClientWithCache(options, extractor, nil)
 }
 
 // NewJWKClientWithCache creates a new JWKClient instance from the
 // provided options and a custom keycacher interface.
 // Passing nil to keyCacher will create a persistent key cacher
-func NewJWKClientWithCache(options JWKClientOptions, extractor RequestTokenExtractor, keyCacher KeyCacher) *JWKClient {
+func NewJWKClientWithCache[T JWKClientOptions | []JWKClientOptions](options T, extractor RequestTokenExtractor, keyCacher KeyCacher) *JWKClient {
 	if extractor == nil {
 		extractor = RequestTokenExtractorFunc(FromHeader)
 	}
 	if keyCacher == nil {
 		keyCacher = newMemoryPersistentKeyCacher()
 	}
-	if options.Client == nil {
-		options.Client = http.DefaultClient
+
+	var opts []JWKClientOptions
+	switch v := any(options).(type) {
+	case JWKClientOptions:
+		opts = []JWKClientOptions{v}
+	case []JWKClientOptions:
+		opts = v
+	}
+
+	for i := range opts {
+		if opts[i].Client == nil {
+			opts[i].Client = http.DefaultClient
+		}
 	}
 
 	return &JWKClient{
 		keyCacher: keyCacher,
-		options:   options,
+		options:   opts,
 		extractor: extractor,
 	}
 }
@@ -81,33 +92,37 @@ func (j *JWKClient) GetKey(ID string) (jose.JSONWebKey, error) {
 }
 
 func (j *JWKClient) downloadKeys() ([]jose.JSONWebKey, error) {
-	req, err := http.NewRequest("GET", j.options.URI, new(bytes.Buffer))
-	if err != nil {
-		return []jose.JSONWebKey{}, err
+	var allKeys []jose.JSONWebKey
+	for _, opt := range j.options {
+		req, err := http.NewRequest("GET", opt.URI, new(bytes.Buffer))
+		if err != nil {
+			return []jose.JSONWebKey{}, err
+		}
+		resp, err := opt.Client.Do(req)
+
+		if err != nil {
+			return []jose.JSONWebKey{}, err
+		}
+		defer resp.Body.Close()
+
+		if contentH := resp.Header.Get("Content-Type"); !strings.HasPrefix(contentH, "application/json") {
+			return []jose.JSONWebKey{}, ErrInvalidContentType
+		}
+
+		var jwks = JWKS{}
+		err = json.NewDecoder(resp.Body).Decode(&jwks)
+
+		if err != nil {
+			return []jose.JSONWebKey{}, err
+		}
+
+		if len(jwks.Keys) < 1 {
+			return []jose.JSONWebKey{}, ErrNoKeyFound
+		}
+
+		allKeys = append(allKeys, jwks.Keys...)
 	}
-	resp, err := j.options.Client.Do(req)
-
-	if err != nil {
-		return []jose.JSONWebKey{}, err
-	}
-	defer resp.Body.Close()
-
-	if contentH := resp.Header.Get("Content-Type"); !strings.HasPrefix(contentH, "application/json") {
-		return []jose.JSONWebKey{}, ErrInvalidContentType
-	}
-
-	var jwks = JWKS{}
-	err = json.NewDecoder(resp.Body).Decode(&jwks)
-
-	if err != nil {
-		return []jose.JSONWebKey{}, err
-	}
-
-	if len(jwks.Keys) < 1 {
-		return []jose.JSONWebKey{}, ErrNoKeyFound
-	}
-
-	return jwks.Keys, nil
+	return allKeys, nil
 }
 
 // GetSecret implements the GetSecret method of the SecretProvider interface.
