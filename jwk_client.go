@@ -34,8 +34,8 @@ type JWKClient struct {
 
 // NewJWKClient creates a new JWKClient instance from the provided options.
 // It accepts either a single JWKClientOptions or a slice of JWKClientOptions.
-func NewJWKClient[T JWKClientOptions | []JWKClientOptions](options T, extractor RequestTokenExtractor) *JWKClient {
-	return NewJWKClientWithCache(options, extractor, nil)
+func NewJWKClient[T JWKClientOptions | []JWKClientOptions](optionOrOptions T, extractor RequestTokenExtractor) *JWKClient {
+	return NewJWKClientWithCache(optionOrOptions, extractor, nil)
 }
 
 // NewJWKClientWithCache creates a new JWKClient instance from the
