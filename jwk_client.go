@@ -41,7 +41,7 @@ func NewJWKClient[T JWKClientOptions | []JWKClientOptions](options T, extractor 
 // NewJWKClientWithCache creates a new JWKClient instance from the
 // provided options and a custom keycacher interface.
 // Passing nil to keyCacher will create a persistent key cacher
-func NewJWKClientWithCache[T JWKClientOptions | []JWKClientOptions](options T, extractor RequestTokenExtractor, keyCacher KeyCacher) *JWKClient {
+func NewJWKClientWithCache[T JWKClientOptions | []JWKClientOptions](optionOrOptions T, extractor RequestTokenExtractor, keyCacher KeyCacher) *JWKClient {
 	if extractor == nil {
 		extractor = RequestTokenExtractorFunc(FromHeader)
 	}
@@ -50,7 +50,7 @@ func NewJWKClientWithCache[T JWKClientOptions | []JWKClientOptions](options T, e
 	}
 
 	var opts []JWKClientOptions
-	switch v := any(options).(type) {
+	switch v := any(optionOrOptions).(type) {
 	case JWKClientOptions:
 		opts = []JWKClientOptions{v}
 	case []JWKClientOptions:
