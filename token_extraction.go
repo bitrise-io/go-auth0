@@ -58,7 +58,7 @@ func FromHeader(r *http.Request) (*jwt.JSONWebToken, error) {
 	if raw == "" {
 		return nil, ErrTokenNotFound
 	}
-	return jwt.ParseSigned(raw, []jose.SignatureAlgorithm{jose.HS256, jose.RS256, jose.ES384})
+	return jwt.ParseSigned(raw, []jose.SignatureAlgorithm{jose.HS256, jose.RS256, jose.ES384, jose.HS384})
 }
 
 // FromParams returns the JWT when passed as the URL query param "token".
@@ -67,5 +67,5 @@ func FromParams(r *http.Request) (*jwt.JSONWebToken, error) {
 	if raw == "" {
 		return nil, ErrTokenNotFound
 	}
-	return jwt.ParseSigned(raw, []jose.SignatureAlgorithm{jose.HS256, jose.RS256, jose.ES384})
+	return jwt.ParseSigned(raw, []jose.SignatureAlgorithm{jose.HS256, jose.RS256, jose.ES384, jose.HS384})
 }
