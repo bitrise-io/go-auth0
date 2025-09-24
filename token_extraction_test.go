@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"gopkg.in/go-jose/go-jose.v2"
-	"gopkg.in/go-jose/go-jose.v2/jwt"
+	"github.com/go-jose/go-jose/v4"
+	"github.com/go-jose/go-jose/v4/jwt"
 )
 
 func TestFromRequestHeaderExtraction(t *testing.T) {
@@ -25,7 +25,7 @@ func TestFromRequestHeaderExtraction(t *testing.T) {
 	}
 
 	claims := jwt.Claims{}
-	err = token.Claims([]byte("secret"), &claims)
+	err = token.Claims(defaultSecret, &claims)
 	if err != nil {
 		t.Errorf("Claims should be decoded correctly with default token: %q \n", err)
 		t.FailNow()
@@ -48,7 +48,7 @@ func TestFromRequestParamsExtraction(t *testing.T) {
 	}
 
 	claims := jwt.Claims{}
-	err = token.Claims([]byte("secret"), &claims)
+	err = token.Claims(defaultSecret, &claims)
 	if err != nil {
 		t.Errorf("Claims should be decoded correctly with default token: %q \n", err)
 		t.FailNow()
@@ -81,7 +81,7 @@ func TestFromMultipleExtraction(t *testing.T) {
 		}
 
 		claims := jwt.Claims{}
-		err = token.Claims([]byte("secret"), &claims)
+		err = token.Claims(defaultSecret, &claims)
 		if err != nil {
 			t.Errorf("Claims should be decoded correctly with default token: %q \n", err)
 			t.FailNow()

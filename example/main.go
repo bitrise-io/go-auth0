@@ -1,18 +1,19 @@
 package main
 
 import (
-	"github.com/bitrise-io/go-auth0"
-	"time"
-
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
-	cors "github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
-	jose "gopkg.in/go-jose/go-jose.v2"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"time"
+
+	cors "github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
+	jose "github.com/go-jose/go-jose/v4"
+
+	"github.com/bitrise-io/go-auth0"
 )
 
 var (

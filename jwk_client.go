@@ -8,7 +8,7 @@ import (
 	"strings"
 	"sync"
 
-	"gopkg.in/go-jose/go-jose.v2"
+	"github.com/go-jose/go-jose/v4"
 )
 
 var (
