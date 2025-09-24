@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"time"
 
-	"gopkg.in/go-jose/go-jose.v2"
-	"gopkg.in/go-jose/go-jose.v2/jwt"
+	"github.com/go-jose/go-jose/v4"
+	"github.com/go-jose/go-jose/v4/jwt"
 )
 
 // SecretProvider will provide everything
@@ -49,7 +49,7 @@ type Configuration struct {
 func NewConfiguration(provider SecretProvider, audience []string, issuer string, method jose.SignatureAlgorithm) Configuration {
 	return Configuration{
 		secretProvider: provider,
-		expectedClaims: jwt.Expected{Issuer: issuer, Audience: audience},
+		expectedClaims: jwt.Expected{Issuer: issuer, AnyAudience: audience},
 		signIn:         method,
 	}
 }
@@ -58,7 +58,7 @@ func NewConfiguration(provider SecretProvider, audience []string, issuer string,
 func NewConfigurationTrustProvider(provider SecretProvider, audience []string, issuer string) Configuration {
 	return Configuration{
 		secretProvider: provider,
-		expectedClaims: jwt.Expected{Issuer: issuer, Audience: audience},
+		expectedClaims: jwt.Expected{Issuer: issuer, AnyAudience: audience},
 	}
 }
 

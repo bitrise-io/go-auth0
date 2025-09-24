@@ -10,8 +10,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/go-jose/go-jose/v4"
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/go-jose/go-jose.v2"
 )
 
 type mockKeyCacher struct {
